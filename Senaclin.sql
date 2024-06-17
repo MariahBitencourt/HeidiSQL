@@ -46,8 +46,8 @@ SHOW TABLES /*Mostra as tabelas do banco de dados selecionado*/
 
 CREATE TABLE recepcionista (
 idRecepcionista INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-nomeRecpcionista VARCHAR (50) NOT NULL,
-loginRecpconista VARCHAR (50) NOT NULL,
+nomeRecepcionista VARCHAR (50) NOT NULL,
+loginRecepcionista VARCHAR (50) NOT NULL,
 senha CHAR (8) NOT NULL,
 celular CHAR (11) NOT NULL,
 nomeLogradouro VARCHAR(50) NOT NULL,
@@ -118,5 +118,105 @@ SET FOREIGN_KEY_CHECKS = 1;
 DROP TABLE consulta
 
 
+/*Inserindo dois ou mais registros*/
+INSERT INTO medico (nomeMedico,loginMedico,senha,crm)
+VALUES ('Dra.Rosana','rosana@gmail.com','12345678','666333MG');
+
+INSERT INTO medico (nomeMedico,loginMedico,senha,crm)
+VALUES ('Dr.Heitor','heitor@gmail.com','12345678','555333SP');
+
+SELECT * FROM medico 
+
+INSERT INTO medico (nomeMedico,loginMedico,senha,crm)
+VALUES  ('Dr.Ricardo','ricardo@gmail.com','12345678','777222MG'),
+('Dr.Graziella','graziella@gmail.com','12345678','555111RJ');
+
+SELECT nomeMedico,crm FROM medico /*Escolhendo algumas colunas*/
+SELECT * FROM medico /*Trazendo todas as colunas*/
+
+/*Insert Explícito*/
+INSERT INTO medico (crm, nomeMedico,senha,loginMedico)
+VALUES ('666111SP','Dra. Ana Maria de novo','anamaria@gmail.com');
 
 
+/*Insert Implícito*/
+INSERT INTO medico
+VALUES (5,'Dra. Ana Paula','anapaula@gmail.com','11223344','121111SP');
+
+
+/*Excluir Registros*/
+DELETE FROM medico 
+WHERE idMedico = 5
+
+SELECT * FROM medico 
+
+
+/*Buscar Filtros*/
+SELECT * FROM medico 
+WHERE idMedico = 6
+
+/*Buscar com filtros*/
+SELECT FROM medico
+WHERE idMedico = 6
+
+/*Filtros e Operadores*/
+SELECT idMedico,nomeMedico,crm FROM medico 
+WHERE idMedico >= 2 AND idMedico <= 6
+
+/*Filtros com Between*/
+SELECT idMedico,nomeMedico,crm FROM medico
+WHERE idMedico BETWEEN 2 AND 6
+
+UPDATE medico
+SET senha='12345678',
+loginMedico='anamarianova@gmail.com'
+WHERE idMedico=4
+
+
+SELECT * FROM medico 
+WHERE crm like '%MG'
+
+DELETE FROM medico 
+WHERE idMedico = 6
+
+
+SELECT nomeMedico,crm,loginMedico FROM medico
+WHERE nomeMedico LIKE 'Dra. An%'
+
+/*Ordenando resultados de uma consulta*/
+SELECT * FROM medico
+ORDER BY nomeMedico ASC/*Crescente*/
+
+
+SELECT * FROM medico
+ORDER BY nomeMedico DESC /*Decresente*/
+
+
+/*Inserir 03 pacientes e 03 recepcionistas no BD*/
+INSERT INTO paciente (nome,cpf,dataNascimento,doencasPreexistentes,tipoSanguineo) 
+VALUES ('Mariah','45249131816','2007-06-30 21:30','Não Consta','O+');
+
+SELECT * FROM paciente
+
+INSERT INTO paciente (nome,cpf,dataNascimento,doencasPreexistentes,tipoSanguineo)
+VALUES ('Filipe','54421170801','2005-10-23','1 mês de vida','O-'),
+('Livia','12385266632','2005-12-01','Crise de epilepsia','A-');
+
+
+INSERT INTO recepcionista (nomeRecepcionista,loginRecepcionista,senha,celular,nomeLogradouro,numero,complemento,cep,cidade,estado)
+VALUES ('Fernando','fernando@gmail.com','12345678','13123456783','Rua do meio','1980','13','12356784','São Vicente','SP'),
+('Kauan','kauanzinho@gmail.com','12345678','13987456123','Rua alfredinho','95','32','98765423','Santos','SP'),
+('Pedro','pedrinho@gmail.com','12345678','13654987123','Rua pedro','18','20','32145698','Santos','SP');
+
+SELECT * FROM recepcionista
+
+DELETE FROM recepcionista
+WHERE idRecepcionista = 6 
+
+
+/*Inserindo Consulta*/
+INSERT INTO consulta (idMedico,idPaciente,idRecepcionista,dataHoraConsulta,tipoConsulta)
+VALUES
+(2,1,2,'2024-06-24 18:30',0);
+
+SELECT * FROM consulta
