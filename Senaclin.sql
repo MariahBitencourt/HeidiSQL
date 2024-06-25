@@ -220,3 +220,180 @@ VALUES
 (2,1,2,'2024-06-24 18:30',0);
 
 SELECT * FROM consulta
+
+
+/*Funções de agregação*/
+/*Conta as ocorrências*/
+SELECT COUNT(idMedico) AS 'Quantidade de Médicos'
+FROM medico
+WHERE crm LIKE '%MG'
+
+/*Pega o valor máximo/maior: data, hora, inteiro,decimal */
+SELECT MAX(dataHoraConsulta) FROM consulta
+/* Pega o valor mínimo/menor : data, hora, inteiro,decimal*/
+
+/*Realiza a soma dos valores*/
+SELECT SUM(idRecepcionista) FROM recepcionista
+
+/*Realiza a media aritmética simples de determinados valores*/
+SELECT AVG(idPaciente) FROM paciente 
+
+SELECT * FROM medico
+
+SELECT COUNT(idMedico) AS 'Quantidade de Médicos'
+FROM medico
+WHERE crm LIKE '%SP'
+
+
+SELECT * FROM paciente
+
+INSERT INTO paciente (nome,cpf,dataNascimento,tiposanguineo)
+VALUES 
+('Magali','55566677788','2001-07-07 6:55:00','O+'),
+('Mônica','99966677788','2002-10-02 13:22:00','O+'),
+('Cascão','99966611188','2000-12-22 11:21:00','B-'),
+('Penadinho','22266677788','1997-08-01 12:22:00','O-');
+
+
+SELECT tiposanguineo 'Tipos Sanguíneos',
+COUNT(idPaciente) AS 'Total Paciente' 
+FROM paciente
+GROUP BY tiposanguineo
+
+
+/*Como NÃO fazer? */
+SELECT COUNT(idPaciente) AS 'Total Pacientes',
+FROM paciente
+GROUP BY tiposanguineo
+
+SELECT tiposanguineo AS 'Tipos Sanguineos',
+COUNT(idPaciente) AS 'Total de Pacientes'
+FROM paciente
+
+SELECT * FROM paciente
+SELECT * FROM medico
+
+SELECT tiposanguineo AS 'Tipos Sanguineos',
+COUNT(idPaciente) AS 'Total de Pacientes'
+FROM paciente
+GROUP BY tiposanguineo
+ORDER BY COUNT(idPaciente) DESC
+
+
+SELECT tiposanguineo AS 'Tipos Sanguineos',
+COUNT(idPaciente) AS 'Total de Pacientes'
+FROM paciente
+GROUP BY tiposanguineo
+HAVING COUNT(idPaciente)>=2
+ORDER BY COUNT(idPaciente) DESC
+
+
+/*WHERE só funciona com as colunas nativas*/
+/*HAVING funciona com filtro e função de agregação*/
+/*ORDER BY funciona com todos ou seja função de agregação ou colunas*/
+
+
+
+/****JOIN****/
+/* /* Traga o nome do médico, o crm e a data da consulta marcada 
+para ele levando em conta todos os médicos que possuem 
+consultas */
+
+
+SELECT nomeMedico,nome,crm,dataHoraConsulta FROM medico
+INNER JOIN consulta
+ON medico.idMedico = consulta.idMedico 
+INNER JOIN paciente
+ON consulta.idPaciente = paciente.idPaciente;
+
+
+SELECT * FROM consulta;
+SELECT * FROM medico;
+SELECT * FROM paciente;
+
+/*Qual a diferença em resultado?*/
+SELECT nomeMedico,crm,dataHoraConsulta FROM
+medico
+LEFT JOIN consulta
+ON medico.idMedico = consulta.idMedico 
+
+SELECT nomeMedico,crm,dataHoraConsulta FROM
+medico
+INNER JOIN consulta
+ON medico.idMedico = consulta.idMedico 
+
+
+/*Criar uma query que traga o nome recepcionista, o celular dele,
+e a data da consulta que ele marcou*/
+
+SELECT nomeRecepcionista,celular,dataHoraConsulta FROM 
+recepcionista
+INNER JOIN consulta
+ON recepcionista.idRecepcionista = consulta.idRecepcionista
+
+SELECT * FROM recepcionista
+SELECT * FROM consulta
+
+
+/*B - Criar uma query que traga o nome do paciente, seu documento,
+o nome do médico, o crm, a data da consulta e o recepcionista 
+que a marcou */
+
+SELECT nome,cpf,nomeMedico,crm,dataHoraConsulta,nomeRecepcionista FROM paciente
+INNER JOIN consulta 
+ON paciente.idPaciente = consulta.idPaciente
+INNER JOIN medico 
+ON medico.idMedico = consulta.idMedico
+INNER JOIN recepcionista
+ON recepcionista.idRecepcionista = consulta.idRecepcionista 
+
+/*C - Criar uma query que traga quantas consultas existem 
+na clínica */
+ SELECT COUNT(*) AS 'Quantidades de Consulta'
+ FROM consulta;
+
+/*D - Criar uma query que traga o nome do paciente, o email,
+o tipo sanguineo e a data de suas consultas
+mas somente dos pacientes que possuem email*/
+
+SELECT nome,email,tipoSanguineo,dataHoraConsulta FROM 
+paciente INNER JOIN consulta 
+ON paciente.idPaciente = consulta.idPaciente
+WHERE email <> 'Não informado' AND email IS NOT NULL AND email <>''
+/*opção kauan ou joão H*/
+
+WHERE email LIKE '%@%' /*opçõa gabrielly*/
+
+
+SELECT * FROM paciente
+ 
+/*E - Criar uma query que traga o nome de TODOS OS paciente, 
+o nome do médico, a data da consulta
+independente de os pacientes possuírem consultas */
+
+SELECT nome,nomeMedico,dataHoraConsulta FROM paciente
+LEFT JOIN consulta 
+ON paciente.idPaciente = consulta.idPaciente
+LEFT JOIN medico
+ON medico.idMedico = consulta.idMedico
+
+
+/*Desafio Final - Trazer a quantidade de consultas 
+que possuo na clínica agrupada 
+por tipo sanguineo do paciente*/
+
+SELECT tipoSanguineo AS 'Tipo Sanguineo e Paciente',
+COUNT(consulta.idPaciente) AS 'Quantidade de Consultas'
+FROM paciente
+INNER JOIN consulta
+ON paciente.idPaciente = consulta.idPaciente
+GROUP BY tipoSanguineo
+
+SELECT COUNT(consulta.idPaciente) AS 'Quantidade de Consultas',
+tipoSanguineo AS 'Tipo Sangue'
+FROM paciente 
+INNER JOIN consulta 
+ON paciente.idPaciente = consulta.idPaciente
+GROUP BY tipoSanguineo
+
+
