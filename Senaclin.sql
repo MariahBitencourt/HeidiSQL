@@ -396,4 +396,134 @@ INNER JOIN consulta
 ON paciente.idPaciente = consulta.idPaciente
 GROUP BY tipoSanguineo
 
+/*1.Buscar nome do médico, nome da especialidade, 
+e crm de todos os médicos cuja especialidade ou seja “Cardiologista*/
 
+SELECT nomeMedico,nomeEspecialidade,crm FROM medico
+INNER JOIN especialidade ON especialidade.idEspecialidade = medico.idEspecialidade
+WHERE nomeEspecialidade LIKE '%Cardiologista'novaclin
+
+
+/* View - Estrutura CREATE, DROP ALTER*//*NÃO MUDA DADOS*/
+
+DROP VIEW vw_relatorioConsulta
+
+CREATE VIEW vw_relatorioConsulta 
+AS 
+SELECT nome AS 'Nome do paciente',cpf,nomeMedico AS 'Nome do médico',
+crm,dataHoraConsulta AS 'Data',nomeRecepcionista AS 'Nome do recepcionista' 
+FROM 
+paciente 
+INNER JOIN consulta
+ON paciente.idPaciente = consulta.idpaciente
+INNER JOIN medico 
+ON medico.idMedico = consulta.idMedico
+INNER JOIN recepcionista 
+ON recepcionista.idRecepcionista = consulta.idRecepcionista
+
+/*Executar uma view*/
+SELECT * FROM vw_relatorioConsulta
+ORDER BY 'Data' DESC;
+
+
+/*Criar uma VIEW para trazer a quantidade*/
+CREATE VIEW vw_tipoSanguineo
+AS 
+SELECT COUNT(consulta.idPaciente) AS 'Quantidade de Consultas',
+tipoSanguineo AS 'Tipo Sanguineo'
+FROM paciente 
+INNER JOIN consulta 
+ON paciente.idPaciente = consulta.idPaciente
+GROUP BY tipoSanguineo
+
+SELECT * FROM vw_tipoSanguineo
+
+
+/*Stored Procedures OU Procedimentos Armazenados para inserir algo 
+CREATE/ DROP/ ALTER */
+/*MUDA DADOS OU (NÃO)*/
+
+CREATE PROCEDURE pi_recepcionista
+(IN 
+nomeRecepcionsta VARCHAR(50),
+loginRecepcionista VARCHAR(50),
+senha CHAR(8),
+celular CHAR(11),
+nomeLogradouro VARCHAR(50),
+numero VARCHAR(7),
+complemento VARCHAR(10),
+cep CHAR(8),
+cidade VARCHAR(30),
+estado CHAR(2))
+
+INSERT INTO recepcionista 
+(nomeRecepcionista,loginRecepcionista,senha,celular,
+nomeLogradouro,numero,complemento,cep,cidade,estado)
+VALUES (nomeRecepcionista,loginRecepcionista,senha,celular,
+nomeLogradouro,numero,complemento,cep,cidade,estado);
+
+/*Chamar a Stored Procedure*/
+CALL pi_recepcionista('Rosa da Silva','rosa.silva@gmail.com','22445677',
+'11997455994','RuaPatriarca','67',NULL,'11000000','São Paulo','SP');
+
+/**/
+SELECT * FROM recepcionista
+
+DELETE FROM recepcionista WHERE idRecepcionista=4;*/
+
+
+/*Deletar recepcionista*/
+
+CREATE PROCEDURE pd_recepcionista
+(param_idRecepcionista INT)
+DELETE FROM recepcionista
+WHERE idRecepcionista = param_idRecepcionista
+
+CALL pd_recepcionista(6)
+
+SELECT * FROM recepcionista
+
+
+/*Criar uma procedure que liste nome do paciente, e tipo Sanguineo todos pacientes de determinada cidade*/
+
+CREATE PROCEDURE ps_ListaPacienteTipoSanguineo
+(IN tipo VARCHAR(3))
+SELECT nome,tipoSanguineo from paciente
+WHERE tipoSanguineo=tipo;
+
+CALL ps_ListaPacienteTipoSanguineo('B-');
+
+
+/*Crie uma procedure que mostre todas as consultas de acordo com o id do Medico ordenada por data - AGENDA DO MÉDICO*/
+
+CREATE PROCEDURE ps_idMedicoDataHoraConsulta
+(IN param_idMedico INT)
+SELECT idMedico,dataHoraConsulta FROM consulta
+WHERE idMedico=param_idMedico
+ORDER BY dataHoraConsulta ASC
+
+CALL ps_idMedicoDataHoraConsulta('2');
+ 
+
+/*Criar uma procedure que conta o total de consultas que possua na clínica*/
+
+CREATE PROCEDURE ps_totalDataHoraConsultas()
+SELECT COUNT(idConsulta) AS 'Total de Consultas' FROM consulta
+
+CALL ps_totalDataHoraConsultas;
+
+
+/*Criar uma procedure que mostre o nome do paciente, 
+a data da consulta e o nome do médico, de acordo com o nome do paciente informado*/
+
+CREATE PROCEDURE ps_nomePacientedataHoraConsultaNomeMedico
+(IN nome VARCHAR(50),
+dataHoraConsulta DATETIME,
+nomeMedico VARCHAR(50),
+idConsulta INT)
+SELECT nome,dataHoraConsulta,nomeMedico FROM consulta
+
+
+CALL ps_nomePacientedataHoraConsultaNomeMedico('Mariah');
+
+SELECT * FROM consulta
