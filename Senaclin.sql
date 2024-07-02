@@ -516,14 +516,142 @@ CALL ps_totalDataHoraConsultas;
 /*Criar uma procedure que mostre o nome do paciente, 
 a data da consulta e o nome do médico, de acordo com o nome do paciente informado*/
 
-CREATE PROCEDURE ps_nomePacientedataHoraConsultaNomeMedico
-(IN nome VARCHAR(50),
-dataHoraConsulta DATETIME,
-nomeMedico VARCHAR(50),
-idConsulta INT)
+DROP PROCEDURE ps_nomePacientedataHoraConsultaNomeMedico
+(IN idConsulta INT)
 SELECT nome,dataHoraConsulta,nomeMedico FROM consulta
 
 
-CALL ps_nomePacientedataHoraConsultaNomeMedico('Mariah');
+CALL ps_nomePacientedataHoraConsultaNomeMedico('');
 
 SELECT * FROM consulta
+
+
+/*1.Buscar nome do médico, nome da especialidade, e crm de todos os médicos cuja especialidade
+seja “Cardiologista”.*/
+SELECT nome, nomeEspecialidade, crm
+FROM medico
+INNER JOIN especialidade ON especialidade.idEspecialidade = medico.IdEspecialidade
+WHERE nomeEspecialidade LIKE '%Cardiologista%';
+
+ 
+/*2.Buscar quantos pacientes a clínica possui por cidade.*/
+SELECT cidade, COUNT(*) AS num_pacientes
+FROM paciente
+GROUP BY cidade;
+ 
+/*3.Buscar a data de todas as consultas, nome do médico e o nome do paciente, em ordem
+cronológica. */
+SELECT c.dataHoraConsulta, m.nome AS nome_medico, p.nome AS nome_paciente
+FROM consulta c
+JOIN medico m ON c.idMedico = m.idMedico
+JOIN paciente p ON c.idPaciente = p.idPaciente
+ORDER BY c.dataHoraConsulta;
+
+/*4- Buscar o nome do paciente, celular, email, e a data da consulta 
+de todos os pacientes com consulta marcada, desde que vivam em Santos.*/
+SELECT p.nome, p.cel, p.email, c.dataHoraConsulta
+FROM paciente p
+JOIN consulta c ON p.idPaciente = c.idPaciente
+WHERE p.cidade = 'Santos';
+ 
+/*5- Buscar todos os pacientes que tenham com a letra "P" no nome. */
+SELECT *
+FROM paciente
+WHERE nome LIKE '%P%';
+
+/*6- Buscar o nome do médico, a data da consulta, o nome do paciente e
+ a especialidade do médico de todas as consultas de determinado dia (escolhido por você), em ordem alfabética.*/
+SELECT m.nome AS nome_medico, c.dataHoraConsulta, p.nome AS nome_paciente, e.nomeEspecialidade AS especialidade
+FROM consulta c
+JOIN medico m 
+ON c.idMedico = m.idMedico
+JOIN paciente p 
+ON c.idPaciente = p.idPaciente
+JOIN especialidade e 
+ON m.IdEspecialidade = e.idEspecialidade
+WHERE DATE(c.dataHoraConsulta) = '2024-06-22'
+ORDER BY m.nome;
+ 
+/*7- Buscar o nome dos médicos e sua especialidade, 
+apenas dos médicos com CRM de SP.*/
+SELECT m.nome AS nome_medico, e.nomeEspecialidade AS especialidade
+FROM medico m
+JOIN especialidade e ON m.IdEspecialidade = e.idEspecialidade
+WHERE m.crm LIKE '%SP%';
+
+/*8- Buscar a data da consulta que está mais longe na clínica. */
+SELECT MAX(dataHoraConsulta) AS data_mais_longe
+FROM consulta;
+
+/*9- Buscar quantos médicos a clínica possui por especialidade.*/
+SELECT e.nomeEspecialidade AS especialidade, COUNT(*) AS num_medicos
+FROM medico m
+JOIN especialidade e ON m.IdEspecialidade = e.idEspecialidade
+GROUP BY e.nomeEspecialidade;
+
+/*10- Buscar o nome, celular e email de todos os pacientes
+ que começam com a letra “D” em ordem alfabética.*/
+SELECT nome, cel, email
+FROM paciente
+WHERE nome LIKE 'D%'
+ORDER BY nome;
+
+/*11- Buscar todos os exames, bem como quem foi o médico que solicitou e a data do exame, 
+em ordem cronológica (por data). */
+SELECT nomeExame, m.nome AS medico_solicitante,dataHoraExame
+FROM exame ex
+JOIN consulta c ON ex.idConsulta = c.idConsulta
+JOIN medico m ON c.idMedico = m.idMedico
+JOIN especialidade e ON m.IdEspecialidade = e.idEspecialidade
+ORDER BY ex.dataHoraExame;
+ 
+/*12- Buscar o nome do médico, o crm e a data da consulta,
+ de todos os médicos, ainda que não possuam consultas.*/
+SELECT m.nome AS nome_medico, m.crm, c.dataHoraConsulta
+FROM medico m
+LEFT JOIN consulta c ON m.idMedico = c.idMedico
+ORDER BY m.nome;
+
+/*13-Buscar o nome de todos os pacientes, celular, email e data da consulta em ordem alfabética.
+ Trazer os pacientes ainda que não possuam consultas.*/
+SELECT p.nome, p.cel, p.email, c.dataHoraConsulta
+FROM paciente p
+LEFT JOIN consulta c ON p.idPaciente = c.idPaciente
+ORDER BY p.nome;
+
+/*14- Buscar o nome de todos os pacientes, logradouro, número e complemento apenas dos moradores que moram em São Paulo, em ordem alfabética.*/
+SELECT nome, logradouro, numero, complemento
+FROM paciente
+WHERE cidade = 'São Paulo'
+ORDER BY nome;
+
+/*15- Buscar a data de todas as consultas, o nome do recepcionista que marcou, o nome do
+paciente, o nome do médico, a especialidade do médico e o celular do paciente em ordem
+cronológica invertida.*/
+
+SELECT c.dataHoraConsulta, nomeRecepcionista AS nome_recepcionista, p.nome AS nome_paciente, m.nome AS nome_medico, e.nomeEspecialidade AS especialidade_medico, p.cel AS celular_paciente
+FROM consulta c
+JOIN recepcionista rec ON c.idRecepcionista = rec.idRecepcionista
+JOIN paciente p ON c.idPaciente = p.idPaciente
+JOIN medico m ON c.idMedico = m.idMedico
+JOIN especialidade e ON m.IdEspecialidade = e.idEspecialidade
+ORDER BY c.dataHoraConsulta DESC;
+
+/*Desafio - É possível realizar? Justifique:*/
+/*Sim, é possível realizar essa consulta. Ela envolve múltiplas junções (joins) entre várias tabelas (consulta, recepcionista, paciente, medico e especialidade), onde os relacionamentos são bem definidos através de chaves estrangeiras. A ordenação é feita de forma decrescente pela coluna dataHoraConsulta.*/
+/*Relatório a) - Quantas consultas cada médico realizou na clínica:*/
+
+SELECT m.nome AS nome_medico, COUNT(c.idConsulta) AS num_consultas
+FROM medico m
+LEFT JOIN consulta c ON m.idMedico = c.idMedico
+GROUP BY m.nome;
+
+/*Relatório b) - Quantas consultas foram realizadas por especialidade:*/
+SELECT e.nomeEspecialidade AS especialidade_medico, COUNT(c.idConsulta) AS num_consultas
+FROM consulta c
+JOIN medico m ON c.idMedico = m.idMedico
+JOIN especialidade e ON m.IdEspecialidade = e.idEspecialidade
+GROUP BY e.nomeEspecialidade;
+
+
+
