@@ -654,4 +654,46 @@ JOIN especialidade e ON m.IdEspecialidade = e.idEspecialidade
 GROUP BY e.nomeEspecialidade;
 
 
+/*LISTA 4*/
+
+/*1) Criar uma view que traga nome e contatos (telefones e pacientes) em ordem alfabética 
+e executá-la.*/
+
+CREATE VIEW vw_nomePacienteTelefonePaciente
+AS
+SELECT nome AS 'Nome do Paciente',cel AS 'Celular do Paciente' 
+FROM paciente
+ORDER BY nome;
+
+SELECT * FROM vw_nomePacienteTelefonePaciente
+
+
+/*2) Criar uma view que traga a quantidade de consultas agrupadas por especialidade e 
+executá-la.*/
+
+CREATE VIEW vw_ConsultasPorEspecialidade 
+AS 
+SELECT COUNT(idConsulta) AS 'Quantidade de Consultas'
+FROM consulta
+WHERE nomeEspecialidade LIKE '%Cardiologista'
+
+
+SELECT * FROM consulta
+
+
+/*Transações em Banco de Dados*/
+
+START TRANSACTION;
+
+COMMIT;
+
+ROLLBACK;
+
+START TRANSACTION;
+DELETE FROM consulta;
+ROLLBACK;
+
+SELECT * FROM consulta
+
+
 
